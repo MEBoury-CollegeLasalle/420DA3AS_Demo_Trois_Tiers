@@ -8,8 +8,25 @@ Complexité du projet par rapport aux attentes du cours:
 ```
 Organisation:
 < = = = = = X = = = = = > ~100%
+```
+- [x] <span style="color:lime">Trois tiers simples</span>
+- [x] <span style="color:lime">Classes aux bons endroits</span>
+- [x] <span style="color:lime">Couche métier contrôle l'ensemble</span>
+```
 Complexité du code:
 < = = = = = = = = = = X > ~200%+
+```
+- [x] <span style="color:cornflowerblue">Abstraction (over the top)</span>
+- [x] <span style="color:cornflowerblue">Généralisation (over the top)</span>
+- [x] <span style="color:cornflowerblue">Modularisation (over the top)</span>
+- [ ] <span style="color:red">UI avancée (nope!)</span>
+- [ ] <span style="color:red">Utilisation des objets-modèles (utilise la tech ADO.NET sans types)</span>
+```
 Qualité du code:
 < = = X = = = = = = = = > ~60%
 ```
+- [x] <span style="color:lime">Conventions de noms</span>
+- [x] <span style="color:lime">Typage fort</span>
+- [x] <span style="color:lime">Noms indicatifs</span>
+- [ ] <span style="color:red">Commentaires et documentation (très déficient)</span>
+- [ ] <span style="color:orange">Fonctions atomiques (a revoir)</span>

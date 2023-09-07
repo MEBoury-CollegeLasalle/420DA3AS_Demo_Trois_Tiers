@@ -19,7 +19,7 @@ internal partial class MainMenu : Form {
     }
 
     private void ButtonManageUsers_Click(object sender, EventArgs e) {
-
+        this.myApplication.OpenUserManagementWindow();
     }
 
     private void buttonExit_Click(object sender, EventArgs e) {

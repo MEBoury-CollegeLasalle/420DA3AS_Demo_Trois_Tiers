@@ -29,6 +29,7 @@ internal class MyApplication {
 
     public void OpenUserManagementWindow() {
         this.mainMenu.HideWindow();
+        this.dataService.LoadData<UserDTO>();
         this.userService.OpenUserManagementView();
     }
 

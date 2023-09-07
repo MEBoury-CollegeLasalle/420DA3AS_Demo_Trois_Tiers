@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using Oracle.ManagedDataAccess.Client;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Text;
 
 namespace _420DA3AS_Demo_Trois_Tiers.DataLayer;
@@ -27,7 +28,7 @@ public class DbConnectionOptions {
     private static readonly string PW_OPTION_KEY = "Password";
     private static readonly string DATABASE_OPTION_KEY = "Database";
     private static readonly string ASYNC_OPTION_KEY = "Async";
-    private static readonly string TIMEOUT_OPTION_KEY = "Async";
+    private static readonly string TIMEOUT_OPTION_KEY = "Timeout";
 
     private int? port = null;
     private string? userName = null;

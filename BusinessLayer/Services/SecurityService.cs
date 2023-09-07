@@ -14,7 +14,10 @@ internal class SecurityService {
     }
 
 
-    public string HashPassword(string clearPassword) {
+    public static string? HashPassword(string? clearPassword) {
+        if (clearPassword == null) {
+            return null;
+        }
         byte[] salt = RandomNumberGenerator.GetBytes(SALT_SIZE);
         byte[] key = Rfc2898DeriveBytes.Pbkdf2(
             clearPassword,
@@ -33,7 +36,7 @@ internal class SecurityService {
     }
 
 
-    public bool VerifyPassword(string clearPassword, string hash) {
+    public static bool VerifyPassword(string clearPassword, string hash) {
         string[] segments = hash.Split(SEGMENT_DELIMITER);
         byte[] key = Convert.FromHexString(segments[0]);
         byte[] salt = Convert.FromHexString(segments[1]);

@@ -1,6 +1,6 @@
 ﻿namespace _420DA3AS_Demo_Trois_Tiers.PresentationLayer;
 
-partial class UserManagementView {
+partial class DtoView {
     /// <summary>
     /// Required designer variable.
     /// </summary>
@@ -24,82 +24,59 @@ partial class UserManagementView {
     /// the contents of this method with the code editor.
     /// </summary>
     private void InitializeComponent() {
-        userCombobox = new ComboBox();
-        buttonCreateUser = new Button();
-        buttonEditUser = new Button();
-        buttonUserDetails = new Button();
-        buttonUserDelete = new Button();
+        dataGridView1 = new DataGridView();
+        buttonSave = new Button();
+        buttonCancel = new Button();
+        ((System.ComponentModel.ISupportInitialize) dataGridView1).BeginInit();
         this.SuspendLayout();
         // 
-        // userCombobox
+        // dataGridView1
         // 
-        userCombobox.FormattingEnabled = true;
-        userCombobox.Location = new Point(12, 48);
-        userCombobox.Name = "userCombobox";
-        userCombobox.Size = new Size(350, 28);
-        userCombobox.TabIndex = 0;
-        userCombobox.SelectedIndexChanged += this.UserComboBox_SelectedIndexChanged;
+        dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+        dataGridView1.Location = new Point(12, 12);
+        dataGridView1.Name = "dataGridView1";
+        dataGridView1.RowHeadersWidth = 51;
+        dataGridView1.RowTemplate.Height = 29;
+        dataGridView1.Size = new Size(1109, 362);
+        dataGridView1.TabIndex = 0;
         // 
-        // buttonCreateUser
+        // buttonSave
         // 
-        buttonCreateUser.Location = new Point(368, 46);
-        buttonCreateUser.Name = "buttonCreateUser";
-        buttonCreateUser.Size = new Size(50, 30);
-        buttonCreateUser.TabIndex = 1;
-        buttonCreateUser.Text = "NEW";
-        buttonCreateUser.UseVisualStyleBackColor = true;
-        buttonCreateUser.Click += this.buttonCreateUser_Click;
+        buttonSave.Location = new Point(865, 380);
+        buttonSave.Name = "buttonSave";
+        buttonSave.Size = new Size(125, 36);
+        buttonSave.TabIndex = 1;
+        buttonSave.Text = "Save";
+        buttonSave.UseVisualStyleBackColor = true;
+        buttonSave.Click += this.buttonSave_Click;
         // 
-        // buttonEditUser
+        // buttonCancel
         // 
-        buttonEditUser.Location = new Point(503, 46);
-        buttonEditUser.Name = "buttonEditUser";
-        buttonEditUser.Size = new Size(50, 30);
-        buttonEditUser.TabIndex = 2;
-        buttonEditUser.Text = "EDIT";
-        buttonEditUser.UseVisualStyleBackColor = true;
-        buttonEditUser.Click += this.buttonEditUser_Click;
-        // 
-        // buttonUserDetails
-        // 
-        buttonUserDetails.Location = new Point(424, 46);
-        buttonUserDetails.Name = "buttonUserDetails";
-        buttonUserDetails.Size = new Size(73, 30);
-        buttonUserDetails.TabIndex = 3;
-        buttonUserDetails.Text = "DETAILS";
-        buttonUserDetails.UseVisualStyleBackColor = true;
-        buttonUserDetails.Click += this.buttonUserDetails_Click;
-        // 
-        // buttonUserDelete
-        // 
-        buttonUserDelete.Location = new Point(559, 46);
-        buttonUserDelete.Name = "buttonUserDelete";
-        buttonUserDelete.Size = new Size(50, 30);
-        buttonUserDelete.TabIndex = 4;
-        buttonUserDelete.Text = "NEW";
-        buttonUserDelete.UseVisualStyleBackColor = true;
-        buttonUserDelete.Click += this.buttonUserDelete_Click;
+        buttonCancel.Location = new Point(996, 380);
+        buttonCancel.Name = "buttonCancel";
+        buttonCancel.Size = new Size(125, 36);
+        buttonCancel.TabIndex = 2;
+        buttonCancel.Text = "Cancel";
+        buttonCancel.UseVisualStyleBackColor = true;
+        buttonCancel.Click += this.buttonCancel_Click;
         // 
         // UserManagementView
         // 
         this.AutoScaleDimensions = new SizeF(8F, 20F);
         this.AutoScaleMode = AutoScaleMode.Font;
-        this.ClientSize = new Size(621, 116);
-        this.Controls.Add(buttonUserDelete);
-        this.Controls.Add(buttonUserDetails);
-        this.Controls.Add(buttonEditUser);
-        this.Controls.Add(buttonCreateUser);
-        this.Controls.Add(userCombobox);
+        this.ClientSize = new Size(1133, 428);
+        this.Controls.Add(buttonCancel);
+        this.Controls.Add(buttonSave);
+        this.Controls.Add(dataGridView1);
         this.Name = "UserManagementView";
         this.Text = "UserManagementView";
+        ((System.ComponentModel.ISupportInitialize) dataGridView1).EndInit();
         this.ResumeLayout(false);
     }
 
     #endregion
 
-    private ComboBox userCombobox;
-    private Button buttonCreateUser;
-    private Button buttonEditUser;
-    private Button buttonUserDetails;
-    private Button buttonUserDelete;
+    private DataGridView dataGridView1;
+    private Button buttonSave;
+    private Button buttonCancel;
 }

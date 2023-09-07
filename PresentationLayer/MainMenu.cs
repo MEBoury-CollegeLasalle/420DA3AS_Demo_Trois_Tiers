@@ -7,7 +7,7 @@ internal partial class MainMenu : Form {
 
     public MainMenu(MyApplication application) {
         this.myApplication = application;
-        InitializeComponent();
+        this.InitializeComponent();
     }
 
     public void HideWindow() {

@@ -2,7 +2,6 @@
 using _420DA3AS_Demo_Trois_Tiers.DataLayer;
 using _420DA3AS_Demo_Trois_Tiers.DataLayer.DTOs;
 using System.Configuration;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace _420DA3AS_Demo_Trois_Tiers.BusinessLayer;
 internal class MyApplication {
@@ -15,12 +14,10 @@ internal class MyApplication {
         // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
 
-        this.dataService = DataServiceFactory.GetDataService(this.ReadConnectionConfigurations());
+        this.dataService = DataServiceFactory.GetDataService(ReadConnectionConfigurations());
         this.userService = new DtoService<UserDTO>(this.dataService);
         this.mainMenu = new MainMenu(this);
     }
-
-    private void Initialize() { }
 
     public void OpenMainMenu() {
         Application.Run(this.mainMenu);
@@ -35,10 +32,10 @@ internal class MyApplication {
         this.userService.OpenUserManagementView();
     }
 
-    private DbConnectionOptions ReadConnectionConfigurations() {
+    private static DbConnectionOptions ReadConnectionConfigurations() {
         DbConnectionOptions options = new DbConnectionOptions(
-            (DataServiceType) Enum.Parse(typeof(DataServiceType), 
-            ConfigurationManager.AppSettings["dbType"] 
+            (DataServiceType) Enum.Parse(typeof(DataServiceType),
+            ConfigurationManager.AppSettings["dbType"]
             ?? throw new Exception("Application configurations do not contain the required [dbType] configuration key."),
             true
         ));

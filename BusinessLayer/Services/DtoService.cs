@@ -1,5 +1,4 @@
 ﻿using _420DA3AS_Demo_Trois_Tiers.DataLayer;
-using _420DA3AS_Demo_Trois_Tiers.DataLayer.DAOs;
 using _420DA3AS_Demo_Trois_Tiers.DataLayer.DTOs;
 using _420DA3AS_Demo_Trois_Tiers.PresentationLayer;
 
@@ -15,7 +14,8 @@ internal class DtoService<TDTO> where TDTO : class, IDTO, new() {
         using (DtoView modal = new DtoView()) {
             DialogResult result = modal.ShowDialog();
             if (result == DialogResult.OK) {
-                this.dataService.SaveChanges<TDTO>();
+                int rowChanged = this.dataService.SaveChanges<TDTO>();
+                _ = MessageBox.Show($"[{rowChanged}] have been updated!");
             } else {
                 this.dataService.CancelChanges<TDTO>();
             }

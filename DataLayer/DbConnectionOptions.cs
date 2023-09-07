@@ -1,13 +1,8 @@
 ﻿using Microsoft.Data.SqlClient;
 using MySql.Data.MySqlClient;
 using Oracle.ManagedDataAccess.Client;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Security;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace _420DA3AS_Demo_Trois_Tiers.DataLayer;
 
@@ -59,7 +54,7 @@ public class DbConnectionOptions {
     public string? UserName {
         private get { return this.userName; }
         set {
-            if (value is string && value.Length > 128) {
+            if (value is not null && value.Length > 128) {
                 throw new ArgumentException("User name must be 128 characters or less.");
             }
             this.userName = value;
@@ -68,7 +63,7 @@ public class DbConnectionOptions {
     public string? UserPassword {
         private get { return this.userPassword; }
         set {
-            if (value is string && value.Length > 128) {
+            if (value is not null && value.Length > 128) {
                 throw new ArgumentException("User password must be 128 characters or less.");
             }
             this.userPassword = value;
@@ -77,21 +72,21 @@ public class DbConnectionOptions {
     public string? DatabaseName {
         get { return this.databaseName; }
         set {
-            if (value is string && value.Length > 128) {
+            if (value is not null && value.Length > 128) {
                 throw new ArgumentException("Database name must be 128 characters or less.");
             }
             this.databaseName = value;
         }
     }
     public bool UsesAsync { get; set; } = true;
-    public int ConnectionTimeoutSeconds { 
-        get { return this.connectionTimeoutSeconds; } 
-        set { 
+    public int ConnectionTimeoutSeconds {
+        get { return this.connectionTimeoutSeconds; }
+        set {
             if (value < 0 || value > Int32.MaxValue) {
                 throw new ArgumentException("Timeout value in seconds must be between 0 and 2147483647 inclusively.");
             }
             this.connectionTimeoutSeconds = value;
-        } 
+        }
     }
 
     public DbConnectionOptions(DataServiceType type) {
@@ -174,10 +169,10 @@ public class DbConnectionOptions {
         }
 
         // Handle connection timeout
-        _ = sb.Append(TIMEOUT_OPTION_KEY).Append('=').Append(this.ConnectionTimeoutSeconds.ToString()).Append(';');
+        _ = sb.Append(TIMEOUT_OPTION_KEY).Append('=').Append(this.ConnectionTimeoutSeconds).Append(';');
 
         // handle other options
-        foreach (KeyValuePair<string,string> kvp in this.OtherOptions) {
+        foreach (KeyValuePair<string, string> kvp in this.OtherOptions) {
             _ = sb.Append(kvp.Key).Append('=').Append(kvp.Value).Append(';');
         }
 
@@ -191,6 +186,6 @@ public class DbConnectionOptions {
             default:
                 return new SqlConnection(sb.ToString());
         }
-        
+
     }
 }

@@ -1,10 +1,6 @@
 ﻿using _420DA3AS_Demo_Trois_Tiers.DataLayer.DTOs;
-using MySqlX.XDevAPI.Relational;
-using Org.BouncyCastle.Asn1.X509.Qualified;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Reflection;
 
 namespace _420DA3AS_Demo_Trois_Tiers.DataLayer.DAOs;
 internal class DAO<TDTO> : AbstractDAO<TDTO> where TDTO : class, IDTO, new() {
@@ -28,7 +24,7 @@ internal class DAO<TDTO> : AbstractDAO<TDTO> where TDTO : class, IDTO, new() {
         adapter.UpdateCommand = builder.GetUpdateCommand();
         adapter.DeleteCommand = builder.GetDeleteCommand();
 
-        adapter.Fill(this.GetDataTable());
+        _ = adapter.Fill(this.GetDataTable());
 
         return adapter;
     }
@@ -52,7 +48,7 @@ internal class DAO<TDTO> : AbstractDAO<TDTO> where TDTO : class, IDTO, new() {
         }
 
         DataRow row = this.DtoToDataRow(dto);
-        this.DataAdapter.Update(this.GetDataTable());
+        _ = this.DataAdapter.Update(this.GetDataTable());
         return this.DataRowToDTO(row, dto);
     }
 
@@ -61,7 +57,7 @@ internal class DAO<TDTO> : AbstractDAO<TDTO> where TDTO : class, IDTO, new() {
             throw new ArgumentException("Cannot load a DTO with no identifier value set.");
         }
 
-        DataRow row = this.GetDataTable().Select("Id = " + dto.GetIdentifierValue().ToString()).FirstOrDefault() 
+        DataRow row = this.GetDataTable().Select("Id = " + dto.GetIdentifierValue().ToString()).FirstOrDefault()
             ?? throw new Exception($"No row found for selection condition [Id = {dto.GetIdentifierValue()}].");
 
         return this.DataRowToDTO(row, dto);
@@ -73,11 +69,11 @@ internal class DAO<TDTO> : AbstractDAO<TDTO> where TDTO : class, IDTO, new() {
             throw new ArgumentException("Cannot update a DTO with no identifier value set.");
         }
 
-        DataRow row = this.GetDataTable().Select("Id = " + dto.GetIdentifierValue().ToString()).FirstOrDefault() 
+        DataRow row = this.GetDataTable().Select("Id = " + dto.GetIdentifierValue().ToString()).FirstOrDefault()
             ?? throw new Exception($"No row found for selection condition [Id = {dto.GetIdentifierValue()}].");
 
-        this.DtoToDataRow(dto, row);
-        this.DataAdapter.Update(this.GetDataTable());
+        _ = this.DtoToDataRow(dto, row);
+        _ = this.DataAdapter.Update(this.GetDataTable());
 
         return this.DataRowToDTO(row, dto);
     }
@@ -87,10 +83,10 @@ internal class DAO<TDTO> : AbstractDAO<TDTO> where TDTO : class, IDTO, new() {
             throw new ArgumentException("Cannot delete a DTO with no identifier value set.");
         }
 
-        DataRow row = this.GetDataTable().Select("Id = " + dto.GetIdentifierValue().ToString()).FirstOrDefault() 
+        DataRow row = this.GetDataTable().Select("Id = " + dto.GetIdentifierValue().ToString()).FirstOrDefault()
             ?? throw new Exception($"No row found for selection condition [Id = {dto.GetIdentifierValue()}].");
 
         row.Delete();
-        this.DataAdapter.Update(this.GetDataTable());
+        _ = this.DataAdapter.Update(this.GetDataTable());
     }
 }

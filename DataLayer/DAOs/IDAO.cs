@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 
 namespace _420DA3AS_Demo_Trois_Tiers.DataLayer.DAOs;
 internal interface IDAO {

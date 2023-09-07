@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace _420DA3AS_Demo_Trois_Tiers.DataLayer.DTOs;
+﻿namespace _420DA3AS_Demo_Trois_Tiers.DataLayer.DTOs;
 
 internal class UserDTO : IDTO, IHasPasswordFields {
     private const string TABLE_NAME = "Users";

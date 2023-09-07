@@ -1,6 +1,5 @@
 ﻿using _420DA3AS_Demo_Trois_Tiers.DataLayer.DAOs;
 using _420DA3AS_Demo_Trois_Tiers.DataLayer.DTOs;
-using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Data.Common;
 
@@ -19,7 +18,7 @@ internal class DataService {
     public DataTable GetDataTable<TDTO>() where TDTO : class, IDTO, new() {
         return this.daoList.FirstOrDefault(dao => {
             return dao is DAO<TDTO>;
-        })?.GetDataTable() 
+        })?.GetDataTable()
             ?? throw new Exception($"No data table found for DTO type [{typeof(TDTO).FullName}].");
     }
 
@@ -30,11 +29,11 @@ internal class DataService {
         dao.LoadData();
     }
 
-    public void SaveChanges<TDTO>() where TDTO : class, IDTO, new() {
+    public int SaveChanges<TDTO>() where TDTO : class, IDTO, new() {
         IDAO dao = this.daoList.FirstOrDefault(dao => {
             return dao is DAO<TDTO>;
         }) ?? throw new Exception($"No dao found for DTO type [{typeof(TDTO).FullName}].");
-        dao.SaveChanges();
+        return dao.SaveChanges();
     }
 
     public void CancelChanges<TDTO>() where TDTO : class, IDTO, new() {

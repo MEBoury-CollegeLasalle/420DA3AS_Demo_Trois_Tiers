@@ -1,16 +1,9 @@
 ﻿using _420DA3AS_Demo_Trois_Tiers.BusinessLayer.Services;
 using _420DA3AS_Demo_Trois_Tiers.DataLayer.DTOs;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _420DA3AS_Demo_Trois_Tiers.DataLayer.DAOs;
 
@@ -88,11 +81,11 @@ internal abstract class AbstractDAO<TDTO> : IDAO where TDTO : class, IDTO, new()
 
     private PropertyInfo GetDtoProperty(Type type, string propName) {
 
-        return type.GetProperty(propName) 
+        return type.GetProperty(propName)
             ?? type.GetProperties().Where(prop => {
-            return prop.IsDefined(typeof(DisplayAttribute), false) 
-                && prop.GetCustomAttributes(typeof(DisplayAttribute), false).Cast<DisplayAttribute>().Single().Name == propName;
-             }).FirstOrDefault() 
+                return prop.IsDefined(typeof(DisplayAttribute), false)
+                    && prop.GetCustomAttributes(typeof(DisplayAttribute), false).Cast<DisplayAttribute>().Single().Name == propName;
+            }).FirstOrDefault()
             ?? throw new Exception($"Failed to find property [{propName}] in type [{type.FullName}]");
     }
 
@@ -104,10 +97,10 @@ internal abstract class AbstractDAO<TDTO> : IDAO where TDTO : class, IDTO, new()
     }
 
 
-    private void UserRowAddedEventHandler<PasswordedBearingType>(object sender, DataRowChangeEventArgs args) where PasswordedBearingType :new() {
+    private void UserRowAddedEventHandler<PasswordedBearingType>(object sender, DataRowChangeEventArgs args) where PasswordedBearingType : new() {
         if (args.Action == DataRowAction.Add) {
             foreach (string passwordedFieldName in ((IHasPasswordFields) new PasswordedBearingType()).GetPasswordFieldsNames()) {
-                DataColumn column = this.GetDataTable().Columns[passwordedFieldName] 
+                DataColumn column = this.GetDataTable().Columns[passwordedFieldName]
                     ?? throw new Exception($"Unable to find password-bearing property [{passwordedFieldName}] in object of type [{typeof(PasswordedBearingType).FullName}].");
                 args.Row.SetField<string>(column, SecurityService.HashPassword(args.Row.Field<string>(column)));
             }

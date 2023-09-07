@@ -48,7 +48,7 @@ partial class DtoView {
         buttonSave.TabIndex = 1;
         buttonSave.Text = "Save";
         buttonSave.UseVisualStyleBackColor = true;
-        buttonSave.Click += this.buttonSave_Click;
+        buttonSave.Click += this.ButtonSave_Click;
         // 
         // buttonCancel
         // 
@@ -58,7 +58,7 @@ partial class DtoView {
         buttonCancel.TabIndex = 2;
         buttonCancel.Text = "Cancel";
         buttonCancel.UseVisualStyleBackColor = true;
-        buttonCancel.Click += this.buttonCancel_Click;
+        buttonCancel.Click += this.ButtonCancel_Click;
         // 
         // UserManagementView
         // 

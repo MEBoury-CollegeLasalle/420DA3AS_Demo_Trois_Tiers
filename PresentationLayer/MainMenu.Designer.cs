@@ -46,7 +46,7 @@ partial class MainMenu {
         buttonExit.TabIndex = 1;
         buttonExit.Text = "Exit";
         buttonExit.UseVisualStyleBackColor = true;
-        buttonExit.Click += this.buttonExit_Click;
+        buttonExit.Click += this.ButtonExit_Click;
         // 
         // MainMenu
         // 

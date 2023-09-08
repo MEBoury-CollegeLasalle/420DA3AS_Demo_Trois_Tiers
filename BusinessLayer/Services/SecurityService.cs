@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 
 namespace _420DA3AS_Demo_Trois_Tiers.BusinessLayer.Services;
-internal class SecurityService {
+internal class SecurityService : AbstractService {
     private const int SALT_SIZE = 16; // 128 bits
     private const int KEY_SIZE = 32; // 256 bits
     private const int CRYPT_ITERATIONS = 100000;
@@ -9,7 +9,7 @@ internal class SecurityService {
     private static readonly HashAlgorithmName CRYPT_ALGORITHM = HashAlgorithmName.SHA256;
 
 
-    public SecurityService() {
+    public SecurityService() : base() {
 
     }
 

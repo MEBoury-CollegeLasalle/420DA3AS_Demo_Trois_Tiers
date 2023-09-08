@@ -22,7 +22,7 @@ internal partial class MainMenu : Form {
         this.myApplication.OpenUserManagementWindow();
     }
 
-    private void buttonExit_Click(object sender, EventArgs e) {
+    private void ButtonExit_Click(object sender, EventArgs e) {
         this.myApplication.ExitApplication();
     }
 }

@@ -2,9 +2,12 @@
 using _420DA3AS_Demo_Trois_Tiers.DataLayer;
 using _420DA3AS_Demo_Trois_Tiers.DataLayer.DTOs;
 using System.Configuration;
+using System.Diagnostics;
+using System.Text;
 
 namespace _420DA3AS_Demo_Trois_Tiers.BusinessLayer;
 internal class MyApplication {
+    public static bool DO_DEBUG = true;
     private readonly DataService dataService;
     private readonly DtoService<UserDTO> userService;
     private readonly MainMenu mainMenu;
@@ -13,82 +16,129 @@ internal class MyApplication {
         // To customize application configuration such as set high DPI settings or default font,
         // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
-
+        if (DO_DEBUG) {
+            DebuggerService.InitDebugger();
+        }
+        DebuggerService.Info("Initializing application...");
         this.dataService = DataServiceFactory.GetDataService(ReadConnectionConfigurations());
         this.userService = new DtoService<UserDTO>(this.dataService);
         this.mainMenu = new MainMenu(this);
+        DebuggerService.Success("Application initialization completed!");
     }
 
     public void OpenMainMenu() {
-        Application.Run(this.mainMenu);
+        try {
+            Application.Run(this.mainMenu);
+        } catch (Exception ex) {
+            DebuggerService.Error(ex);
+            throw;
+        }
     }
 
     public void ExitApplication() {
+        DebuggerService.Shutdown();
         Application.Exit();
     }
 
     public void OpenUserManagementWindow() {
         this.mainMenu.HideWindow();
-        this.dataService.LoadData<UserDTO>();
         this.userService.OpenUserManagementView();
+        this.mainMenu.ShowWindow();
     }
 
     private static DbConnectionOptions ReadConnectionConfigurations() {
+        string dbTypeConfig = ConfigurationManager.AppSettings["dbType"]
+            ?? throw new Exception("Application configurations do not contain the required [dbType] configuration key.");
         DbConnectionOptions options = new DbConnectionOptions(
-            (DataServiceType) Enum.Parse(typeof(DataServiceType),
-            ConfigurationManager.AppSettings["dbType"]
-            ?? throw new Exception("Application configurations do not contain the required [dbType] configuration key."),
-            true
+            (DataServiceType) Enum.Parse(typeof(DataServiceType), dbTypeConfig, true
         ));
-        DbConnectionProtocol protocol;
-        if (Enum.TryParse<DbConnectionProtocol>(ConfigurationManager.AppSettings["dbProtocol"], true, out protocol)) {
-            options.Protocol = (DbConnectionProtocol) protocol;
-        }
-        string? host = ConfigurationManager.AppSettings["dbHost"];
-        if (host is not null) {
-            options.Host = host;
-        }
-        int port;
-        bool parseAttempt = int.TryParse(ConfigurationManager.AppSettings["dbPort"], out port);
-        if (parseAttempt) {
-            options.Port = port;
-        }
-        string? instanceName = ConfigurationManager.AppSettings["dbInstanceName"];
-        if (instanceName is not null) {
-            options.InstanceName = instanceName;
-        }
-        string? pipeName = ConfigurationManager.AppSettings["dbPipeName"];
-        if (pipeName is not null) {
-            options.PipeName = pipeName;
-        }
-        bool usesIntegratedSecurity;
-        parseAttempt = bool.TryParse(ConfigurationManager.AppSettings["dbUsesIntegratedSecurity"], out usesIntegratedSecurity);
-        if (parseAttempt) {
-            options.UseIntegratedSecurity = usesIntegratedSecurity;
-        }
-        string? userName = ConfigurationManager.AppSettings["dbUserName"];
-        if (userName is not null) {
-            options.UserName = userName;
-        }
-        string? userPassword = ConfigurationManager.AppSettings["dbUserPassword"];
-        if (userPassword is not null) {
-            options.UserPassword = userPassword;
-        }
-        string? databaseName = ConfigurationManager.AppSettings["dbDatabaseName"];
-        if (databaseName is not null) {
-            options.DatabaseName = databaseName;
-        }
-        bool usesAsync;
-        parseAttempt = bool.TryParse(ConfigurationManager.AppSettings["dbUsesAsync"], out usesAsync);
-        if (parseAttempt) {
-            options.UsesAsync = usesAsync;
-        }
-        int connTimeout;
-        parseAttempt = int.TryParse(ConfigurationManager.AppSettings["dbConnectionTimeout"], out connTimeout);
-        if (parseAttempt) {
-            options.ConnectionTimeoutSeconds = connTimeout;
+        DebuggerService.Warn($"Database type configuration detected: [{dbTypeConfig}].");
+
+
+        foreach (string? key in ConfigurationManager.AppSettings.AllKeys) {
+            string? value = ConfigurationManager.AppSettings[key];
+            if (key is not null && value is not null) {
+                bool parseAttempt;
+                if (key.StartsWith("db") && key != "dbType") {
+                    switch (key) {
+                        case "dbProtocol":
+                            DbConnectionProtocol protocol;
+                            if (Enum.TryParse<DbConnectionProtocol>(value, true, out protocol)) {
+                                options.Protocol = protocol;
+                            }
+                            break;
+                        case "dbHost":
+                            options.Host = value;
+                            break;
+                        case "dbPort":
+                            int port;
+                            parseAttempt = int.TryParse(value, out port);
+                            if (parseAttempt) {
+                                options.Port = port;
+                            }
+                            break;
+                        case "dbInstanceName":
+                            options.InstanceName = value;
+                            break;
+                        case "dbUsesIntegratedSecurity":
+                            bool usesIntegratedSecurity;
+                            parseAttempt = bool.TryParse(value, out usesIntegratedSecurity);
+                            if (parseAttempt) {
+                                options.UseIntegratedSecurity = usesIntegratedSecurity;
+                            }
+                            break;
+                        case "dbUserName":
+                            options.UserName = value;
+                            break;
+                        case "dbUserPassword":
+                            options.UserPassword = value;
+                            break;
+                        case "dbDatabaseName":
+                            options.DatabaseName = value;
+                            break;
+                        case "dbUsesAsync":
+                            bool usesAsync;
+                            parseAttempt = bool.TryParse(value, out usesAsync);
+                            if (parseAttempt) {
+                                options.UsesAsync = usesAsync;
+                            }
+                            break;
+                        case "dbPipeName":
+                            int connTimeout;
+                            parseAttempt = int.TryParse(value, out connTimeout);
+                            if (parseAttempt) {
+                                options.ConnectionTimeoutSeconds = connTimeout;
+                            }
+                            break;
+                        default:
+                            options.AddOption(key.Substring(2), value);
+                            break;
+                    }
+                }
+            }
         }
 
         return options;
+    }
+
+    public static string GetRealTypeName(Type t) {
+        if (!t.IsGenericType) {
+            return t.Name;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        _ = sb.Append(t.Name.AsSpan(0, t.Name.IndexOf('`')));
+        _ = sb.Append('<');
+        bool appendComma = false;
+        foreach (Type arg in t.GetGenericArguments()) {
+            if (appendComma) {
+                _ = sb.Append(',');
+            }
+
+            _ = sb.Append(GetRealTypeName(arg));
+            appendComma = true;
+        }
+        _ = sb.Append('>');
+        return sb.ToString();
     }
 }

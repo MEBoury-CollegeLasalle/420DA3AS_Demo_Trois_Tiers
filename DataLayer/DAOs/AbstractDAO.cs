@@ -1,53 +1,61 @@
-﻿using _420DA3AS_Demo_Trois_Tiers.BusinessLayer.Services;
+﻿using _420DA3AS_Demo_Trois_Tiers.BusinessLayer;
+using _420DA3AS_Demo_Trois_Tiers.BusinessLayer.Services;
 using _420DA3AS_Demo_Trois_Tiers.DataLayer.DTOs;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace _420DA3AS_Demo_Trois_Tiers.DataLayer.DAOs;
 
 internal abstract class AbstractDAO<TDTO> : IDAO where TDTO : class, IDTO, new() {
     protected string DtoTableName { get; private set; }
+    protected DbConnection Connection { get; private set; }
     protected DataSet DataSet { get; private set; }
     protected DbDataAdapter DataAdapter { get; set; }
 
-    protected AbstractDAO(DbProviderFactory factory, DataSet dataSet) {
+    protected AbstractDAO(DbProviderFactory factory, DbConnection connection, DataSet dataSet) {
+        if (MyApplication.DO_DEBUG) {
+            DebuggerService.Info($"INITIALIZING DAO OF TYPE [{MyApplication.GetRealTypeName(this.GetType())}]...");
+        }
         this.DtoTableName = new TDTO().GetDbTableName();
-        this.DataAdapter = this.CreateDataAdapter(factory);
+        this.Connection = connection;
         this.DataSet = dataSet;
+        this.DataAdapter = this.CreateDataAdapter(factory);
     }
 
     protected abstract DbDataAdapter CreateDataAdapter(DbProviderFactory factory);
 
     public DataTable GetDataTable() {
-        if (!this.DataSet.Tables.Contains(this.DtoTableName)) {
-            this.LoadData();
-        }
-        return this.DataSet.Tables[this.DtoTableName] ?? throw new Exception($"Table [{this.DtoTableName}] not found.");
+        DataTable table = !this.DataSet.Tables.Contains(this.DtoTableName)
+            ? this.CreateAndLoadTable()
+            : this.DataSet.Tables[this.DtoTableName] ?? throw new Exception($"Table [{this.DtoTableName}] not found.");
+        return table;
     }
 
-    public void LoadData() {
-        bool isForUserDTO = typeof(TDTO).IsAssignableFrom(typeof(IHasPasswordFields));
-        if (isForUserDTO && this.DataSet.Tables.Contains(this.DtoTableName)) {
-            this.GetDataTable().RowChanging -= this.UserRowAddedEventHandler<TDTO>;
-        }
-        _ = this.DataAdapter.Fill(this.DataSet, this.DtoTableName);
-        if (isForUserDTO) {
-            this.GetDataTable().RowChanging += this.UserRowAddedEventHandler<TDTO>;
-        }
+    private DataTable CreateAndLoadTable() {
+        DataTable table = new DataTable(this.DtoTableName);
+        this.DataSet.Tables.Add(table);
+        _ = this.DataAdapter.Fill(table);
+        return table;
+    }
+
+    public void ReloadData() {
+        DataTable table = this.GetDataTable();
+        table.Clear();
+        _ = this.DataAdapter.Fill(table);
     }
 
     public int SaveChanges() {
-        this.GetDataTable().AcceptChanges();
-        return this.DataAdapter.Update(this.GetDataTable());
+        int rowsChanged = this.DataAdapter.Update(this.GetDataTable());
+        return rowsChanged;
     }
 
     public void CancelChanges() {
         this.GetDataTable().RejectChanges();
     }
-
-
 
     protected TDTO DataRowToDTO(DataRow row) {
         TDTO dto = new TDTO();
@@ -94,17 +102,6 @@ internal abstract class AbstractDAO<TDTO> : IDAO where TDTO : class, IDTO, new()
         return type.IsGenericType && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>))
             ? value ?? Convert.ChangeType(value, Nullable.GetUnderlyingType(type) ?? type.GetGenericTypeDefinition())
             : Convert.ChangeType(value, type);
-    }
-
-
-    private void UserRowAddedEventHandler<PasswordedBearingType>(object sender, DataRowChangeEventArgs args) where PasswordedBearingType : new() {
-        if (args.Action == DataRowAction.Add) {
-            foreach (string passwordedFieldName in ((IHasPasswordFields) new PasswordedBearingType()).GetPasswordFieldsNames()) {
-                DataColumn column = this.GetDataTable().Columns[passwordedFieldName]
-                    ?? throw new Exception($"Unable to find password-bearing property [{passwordedFieldName}] in object of type [{typeof(PasswordedBearingType).FullName}].");
-                args.Row.SetField<string>(column, SecurityService.HashPassword(args.Row.Field<string>(column)));
-            }
-        }
     }
 
 }

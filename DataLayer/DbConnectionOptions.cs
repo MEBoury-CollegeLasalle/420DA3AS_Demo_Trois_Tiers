@@ -1,9 +1,12 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using _420DA3AS_Demo_Trois_Tiers.BusinessLayer;
+using _420DA3AS_Demo_Trois_Tiers.BusinessLayer.Services;
+using Microsoft.Data.SqlClient;
 using MySql.Data.MySqlClient;
 using Oracle.ManagedDataAccess.Client;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
 
 namespace _420DA3AS_Demo_Trois_Tiers.DataLayer;
 
@@ -19,7 +22,7 @@ public enum DbConnectionProtocol {
 }
 public class DbConnectionOptions {
     private static readonly string HOST_OPTION_KEY = "server";
-    private static readonly string LOCALHOST_HOST_VALUE = "(local)";
+    private static readonly string LOCALHOST_HOST_VALUE = ".";
     private static readonly int SQLSERVER_DEFAULT_PORT = 1433;
     private static readonly int MYSQL_DEFAULT_PORT = 3306;
     private static readonly int ORACLE_DEFAULT_PORT = 1521;
@@ -35,10 +38,9 @@ public class DbConnectionOptions {
     private string? userPassword = null;
     private string? databaseName = null;
     private int connectionTimeoutSeconds = 15;
-    private Dictionary<string, string> OtherOptions { get; set; }
 
     public DataServiceType Type { get; private set; }
-    public DbConnectionProtocol Protocol { get; set; } = DbConnectionProtocol.TCP;
+    public DbConnectionProtocol? Protocol { get; set; } = null;
     public string Host { get; set; } = LOCALHOST_HOST_VALUE;
     public int? Port {
         get { return this.port; }
@@ -79,7 +81,7 @@ public class DbConnectionOptions {
             this.databaseName = value;
         }
     }
-    public bool UsesAsync { get; set; } = true;
+    public bool UsesAsync { get; set; } = false;
     public int ConnectionTimeoutSeconds {
         get { return this.connectionTimeoutSeconds; }
         set {
@@ -89,6 +91,7 @@ public class DbConnectionOptions {
             this.connectionTimeoutSeconds = value;
         }
     }
+    public Dictionary<string, string> OtherOptions { get; private set; }
 
     public DbConnectionOptions(DataServiceType type) {
         this.Type = type;
@@ -124,26 +127,35 @@ public class DbConnectionOptions {
 
         // Handling protocol / host / port|instance
         _ = sb.Append(HOST_OPTION_KEY).Append('=');
-        switch (this.Protocol) {
-            case DbConnectionProtocol.NAMED_PIPES:
-                _ = this.PipeName ?? throw new Exception("Cannot create connection string for Named Pipe connection with no pipe name given.");
-                _ = sb.Append(@"np:\\").Append(this.Host).Append("\\pipe\\").Append(this.PipeName);
-                break;
-            case DbConnectionProtocol.LPC:
-                _ = sb.Append("lpc:").Append(this.Host);
-                if (this.InstanceName is not null) {
-                    _ = sb.Append('\\').Append(this.InstanceName);
-                }
-                break;
-            case DbConnectionProtocol.TCP:
-            default:
-                _ = sb.Append("tcp:").Append(this.Host);
-                if (this.InstanceName is not null) {
-                    _ = sb.Append('\\').Append(this.InstanceName);
-                } else if (this.Port is not null) {
-                    _ = sb.Append(',').Append(this.Port.ToString());
-                }
-                break;
+        if (this.Protocol is not null) {
+            switch (this.Protocol) {
+                case DbConnectionProtocol.NAMED_PIPES:
+                    _ = this.PipeName ?? throw new Exception("Cannot create connection string for Named Pipe connection with no pipe name given.");
+                    _ = sb.Append(@"np:\\").Append(this.Host).Append("\\pipe\\").Append(this.PipeName);
+                    break;
+                case DbConnectionProtocol.LPC:
+                    _ = sb.Append("lpc:").Append(this.Host);
+                    if (this.InstanceName is not null) {
+                        _ = sb.Append('\\').Append(this.InstanceName);
+                    }
+                    break;
+                case DbConnectionProtocol.TCP:
+                default:
+                    _ = sb.Append("tcp:").Append(this.Host);
+                    if (this.Port is not null) {
+                        _ = sb.Append(',').Append(this.Port.ToString());
+                    } else if(this.InstanceName is not null) {
+                        _ = sb.Append('\\').Append(this.InstanceName);
+                    } 
+                    break;
+            }
+        } else {
+            _ = sb.Append(this.Host);
+            if (this.InstanceName is not null) {
+                _ = sb.Append('\\').Append(this.InstanceName);
+            } else if (this.Port is not null) {
+                _ = sb.Append(',').Append(this.Port.ToString());
+            }
         }
         _ = sb.Append(';');
 
@@ -177,16 +189,47 @@ public class DbConnectionOptions {
             _ = sb.Append(kvp.Key).Append('=').Append(kvp.Value).Append(';');
         }
 
+
+        DebuggerService.Info("Database connection configuration options loaded:");
+        DebuggerService.Info(this.ToString());
+
+
         // Create & return the connection objects for the supported connection types
+        DbConnection connection;
         switch (this.Type) {
-            case DataServiceType.MYSQL:
-                return new MySqlConnection(sb.ToString());
-            case DataServiceType.ORACLE:
-                return new OracleConnection(sb.ToString());
             case DataServiceType.SQL_SERVER:
+                connection = new SqlConnection(sb.ToString());
+                break;
+            case DataServiceType.MYSQL:
+                connection = new MySqlConnection(sb.ToString());
+                break;
+            case DataServiceType.ORACLE:
+                connection = new OracleConnection(sb.ToString());
+                break;
             default:
-                return new SqlConnection(sb.ToString());
+                throw new Exception($"DataServiceType [{Enum.GetName(typeof(DataServiceType), this.Type)}] is not supported.");
         }
 
+        DebuggerService.Success($"Connection object of type [{MyApplication.GetRealTypeName(connection.GetType())}] successfully constructed:");
+        DebuggerService.Success($"Connection string: [{sb}]");
+
+        try {
+            DebuggerService.Warn("Testing database connection...");
+            connection.Open();
+            DebuggerService.Success("Database connection successfully established!");
+        } catch (Exception ex) {
+            DebuggerService.Error("Database connection failure!");
+            DebuggerService.Error(ex);
+            throw;
+        }
+
+        return connection;
+
+    }
+
+    public override string ToString() {
+        string jsonString = JsonSerializer.Serialize(this);
+        JsonDocument jsonDoc = JsonDocument.Parse(jsonString);
+        return JsonSerializer.Serialize(jsonDoc, new JsonSerializerOptions { WriteIndented = true });
     }
 }

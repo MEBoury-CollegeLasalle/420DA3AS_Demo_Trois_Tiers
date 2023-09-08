@@ -5,7 +5,7 @@ internal interface IDAO {
 
     public DataTable GetDataTable();
 
-    public void LoadData();
+    public void ReloadData();
 
     public int SaveChanges();
 

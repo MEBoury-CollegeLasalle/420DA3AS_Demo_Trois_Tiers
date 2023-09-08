@@ -1,6 +1,6 @@
 ﻿namespace _420DA3AS_Demo_Trois_Tiers.PresentationLayer;
 
-partial class DtoView {
+partial class DtoView<TDTO> {
     /// <summary>
     /// Required designer variable.
     /// </summary>

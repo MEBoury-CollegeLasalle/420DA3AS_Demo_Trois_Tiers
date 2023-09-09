@@ -31,10 +31,11 @@ partial class DebuggerWindow {
         // 
         richTextBox1.BackColor = Color.Black;
         richTextBox1.Dock = DockStyle.Fill;
+        richTextBox1.ForeColor = Color.Gainsboro;
         richTextBox1.Location = new Point(0, 0);
         richTextBox1.Name = "richTextBox1";
         richTextBox1.ReadOnly = true;
-        richTextBox1.Size = new Size(582, 553);
+        richTextBox1.Size = new Size(1182, 753);
         richTextBox1.TabIndex = 0;
         richTextBox1.Text = "";
         richTextBox1.WordWrap = false;
@@ -43,7 +44,7 @@ partial class DebuggerWindow {
         // 
         this.AutoScaleDimensions = new SizeF(8F, 20F);
         this.AutoScaleMode = AutoScaleMode.Font;
-        this.ClientSize = new Size(582, 553);
+        this.ClientSize = new Size(1182, 753);
         this.Controls.Add(richTextBox1);
         this.Name = "DebuggerWindow";
         this.Text = "Debugger Window";

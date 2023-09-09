@@ -10,9 +10,10 @@ namespace _420DA3AS_Demo_Trois_Tiers.BusinessLayer.Services;
 internal class DebuggerService : AbstractService {
     private static DebuggerWindow? WINDOW;
     private static bool IS_INITIALIZED = false;
+    private static DebuggerService? INSTANCE { get; set; }
 
-    public DebuggerService() : base() {
-
+    private DebuggerService() : base() {
+        DebuggerService.INSTANCE = this;
     }
 
     public static void InitDebugger() {
@@ -21,7 +22,11 @@ internal class DebuggerService : AbstractService {
         IS_INITIALIZED = true;
     }
 
-    public static void Shutdown() {
+    public static DebuggerService GetInstance() {
+        return INSTANCE ??= new DebuggerService();
+    }
+
+    public override void Shutdown() {
         if (IS_INITIALIZED) {
             WINDOW?.Close();
             WINDOW?.Dispose();

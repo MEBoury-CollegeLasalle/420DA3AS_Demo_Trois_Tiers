@@ -1,18 +1,39 @@
 ﻿using System.Security.Cryptography;
 
 namespace _420DA3AS_Demo_Trois_Tiers.BusinessLayer.Services;
+
+/// <summary>
+/// Service d'encryption à sens unique (hash) de mots de passes. Utilise L'algorithme
+/// de base SHA-256 avec l'algorithme d'étirement de clé PBKDF2 et l'ajout d'un sel 
+/// cryptographique généré automatiquement. Ceci est considéré sécuritaire et applique 
+/// les pratiques recommandées en date de 2022 (vous pouvez utiliser un tel système 
+/// dans un environnement professionnel).<br/>
+/// 
+/// Permet l'encryption des mots de passes elle même:
+/// <code>((mdpEnClair) -> { mdpHashé })</code>
+/// 
+/// Le hashage d'une valeur en utilisant les mêmes paramètres produit 
+/// toujours le même résultat, et le hashage de valeurs différentes produit toujours 
+/// des résultats différents. Ceci permet de valider un mot de passe sans jamais 
+/// décrypter le hash enregistré:
+/// <code>(mdpEnCclair, hash) -> { HashPassword(mdpEnClair) == hash })</code>
+/// </summary>
 internal class SecurityService : AbstractService {
-    private const int SALT_SIZE = 16; // 128 bits
-    private const int KEY_SIZE = 32; // 256 bits
-    private const int CRYPT_ITERATIONS = 100000;
-    private const char SEGMENT_DELIMITER = ':';
-    private static readonly HashAlgorithmName CRYPT_ALGORITHM = HashAlgorithmName.SHA256;
+    // Paramètres de hashage.
+    private const int SALT_SIZE = 16; // sel cryptographique de 128 bits
+    private const int KEY_SIZE = 32; // clé cryptographique de 256 bits
+    private const int CRYPT_ITERATIONS = 100000; // itérations de l'étirement de clé
+    private const char SEGMENT_DELIMITER = ':'; // séparateur des sections générées - NE PAS CHANGER (sinon hashs existants invalidables)
+    private static readonly HashAlgorithmName CRYPT_ALGORITHM = HashAlgorithmName.SHA256; // algorithme de base
 
 
     public SecurityService() : base() {
 
     }
 
+    public override void Shutdown() {
+        // rien à faire dans ce service
+    }
 
     public static string? HashPassword(string? clearPassword) {
         if (clearPassword == null) {
@@ -51,4 +72,5 @@ internal class SecurityService : AbstractService {
         );
         return key.SequenceEqual(inputSecretKey);
     }
+
 }

@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using _420DA3AS_Demo_Trois_Tiers.BusinessLayer;
+using System.Configuration;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Reflection;
@@ -9,26 +10,13 @@ internal class DataServiceFactory {
 
     public static DataService GetDataService(DbConnectionOptions connectionOptions) {
         DbProviderFactory factory = GetFactory(connectionOptions);
-        return new DataService(factory, connectionOptions.GetConnection());
+        return new DataService(factory, connectionOptions.CreateConnection());
     }
 
     private static DbProviderFactory GetFactory(DbConnectionOptions connectionOptions) {
-        DbProviderFactory factory;
-        switch (connectionOptions.Type) {
-            case DataServiceType.SQL_SERVER:
-                factory = Microsoft.Data.SqlClient.SqlClientFactory.Instance;
-                break;
-            case DataServiceType.MYSQL:
-                factory = MySql.Data.MySqlClient.MySqlClientFactory.Instance;
-                break;
-            case DataServiceType.ORACLE:
-                factory = Oracle.ManagedDataAccess.Client.OracleClientFactory.Instance;
-                break;
-            default:
-                throw new Exception($"DataServiceType [{Enum.GetName(typeof(DataServiceType), connectionOptions.Type)}] is not supported.");
-        }
+        Type factoryType = connectionOptions.DbProviderFactoryType ?? throw new Exception("null factory type reference in connection options.");
+        FieldInfo fieldInfo = factoryType.GetField("Instance") ?? throw new Exception("factory type does not posess an 'Instance' field.");
+        return fieldInfo.GetValue(null) as DbProviderFactory ?? throw new Exception("factory type 'Instance' property value is null or not an instance of DbProviderFactory");
         
-        return factory;
-
     }
 }

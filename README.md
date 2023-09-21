@@ -16,9 +16,10 @@ Organisation:
 Complexité du code:
 < = = = = = = = = = = X > ~200%+
 ```
-- [x] <span style="color:cornflowerblue">Abstraction (over the top)</span>
-- [x] <span style="color:cornflowerblue">Généralisation (over the top)</span>
-- [x] <span style="color:cornflowerblue">Modularisation (over the top)</span>
+- [x] <span style="color:dodgerblue">Abstraction (over the top)</span>
+- [x] <span style="color:dodgerblue">Généralisation (over the top)</span>
+- [x] <span style="color:dodgerblue">Modularisation (over the top)</span>
+- [x] <span style="color:dodgerblue">Utilisation de réflexion (over the top)</span>
 - [ ] <span style="color:red">UI avancée (nope!)</span>
 - [ ] <span style="color:red">Utilisation des objets-modèles (utilise la tech ADO.NET sans types)</span>
 ```
